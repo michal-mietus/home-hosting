@@ -1,6 +1,9 @@
 import os
 import sqlite3
-from flask import Flask, g, render_template, request
+from flask import Flask, g, render_template, request, session, url_for, flash, redirect
+from key import SECRET_KEY
+
+
 app = Flask(__name__)
 
 app.config.from_object(__name__) # load config from this file , flaskr.py
@@ -8,7 +11,7 @@ app.config.from_object(__name__) # load config from this file , flaskr.py
 # Load default config and override config from an environment variable
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'mindmaps.db'),
-    SECRET_KEY='development key',
+    SECRET_KEY=SECRET_KEY,
     USERNAME='admin',
     PASSWORD='default'
 ))
@@ -22,38 +25,77 @@ def main():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None
     if request.method == 'POST':
-        cur = get_coursor()
-        sql = "SELECT * FROM users WHERE username='{username}'".format(username=request.form['username'])
-        cur.execute(sql)
-        # all rows
-        print(cur.fetchall())
-
-    return render_template('login.html')
+        if get_user(request.form['username']) == False:
+            error = 'User with this username doesn\'t exists!'
+        else:
+            session['logged_in'] = True
+            flash('You\'re logged in. ')
+            return redirect(url_for('main'))
+    return render_template('login.html', error=error)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     error = None
     if request.method == 'POST':
+        user = User(request.form['username'], request.form['password'])
         if request.form['password'] != request.form['password-confirm']:
             error = 'Passwords are not the same!'
-        elif is_user_created(request.form['username']):
+        elif user.is_created():
             error = 'User with this username already exists!'
         else:
-            
-
+            user.save()
+            session['logged_in'] = True
+            flash('You\'re logged in. ')
+            return redirect(url_for('main'))
     return render_template('register.html', error=error)
 
 
-def is_user_created(username):
-    sql = "SELECT * FROM users WHERE username='{username}'".format(username=username])
-    coursor = get_coursor()
-    coursor.execute(sql)
-    if coursor.fetchall():
-        return True
-    return False
+@app.route('/user/all', methods=['GET', 'POST'])
+def users():
+    sql = 'SELECT * FROM users'
+    cursor = get_cursor()
+    cursor.execute(sql)
+    users = cursor.fetchall()
+    print(users)
+    return render_template('users.html', users=users)
 
+
+class User:
+    class UserAlreadExistsException(Exception): 
+        def __str__(self):
+            return 'User with that username already exists!'
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+        self.table = 'users'
+
+    def save(self):
+        if get_object(self.table, **{'username': self.username}) == []:
+            sql = "INSERT INTO users (username, password) VALUES (?, ?);"
+            db = get_db()  # while inserting have to call db.commit (connection)
+            cursor = get_cursor()
+            cursor.execute(sql, (self.username, self.password))
+            db.commit()  # connection commit
+        else:
+            return self.UserAlreadExistsException()
+
+    def is_created(self):
+        if get_object(self.table, **{'username': self.username}):
+            return True
+        return False
+
+
+def get_object(table, **kwargs):
+    sql = "SELECT * FROM {table} WHERE ".format(table=table)
+    for column, condition in kwargs.items():
+        sql += str(column) + '=' + '\'' + str(condition) + '\''
+    cursor = get_cursor()
+    cursor.execute(sql)
+    return cursor.fetchall()
 
 
 def connect_db():
@@ -87,10 +129,10 @@ def get_db():
     return g.sqlite_db
 
 
-def get_coursor():
-    """Returns SQlite coursor. """
-    coursor = get_db().coursor()
-    return coursor
+def get_cursor():
+    """Returns SQlite cursor. """
+    cursor = get_db().cursor()
+    return cursor
 
 
 @app.cli.command('initdb')
