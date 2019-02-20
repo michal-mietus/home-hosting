@@ -6,7 +6,7 @@
 {% block content %}
     {% for filename in filenames %}
     <div >
-        <img style='max-width: 300px' src="{{ url_for('static', filename=filename) }}">
+        <img style='max-width: 100%; display: block; margin-left:auto; margin-right: auto; padding: 15px 0 15px 0;' src="{{ url_for('static', filename=filename) }}">
     </div>
     {% endfor %}
 {% endblock %}
