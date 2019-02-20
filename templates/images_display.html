@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Images{% endblock %}
+
+{% block content %}
+    {% for filename in filenames %}
+    <div >
+        <img style='max-width: 300px' src="{{ url_for('static', filename=filename) }}">
+    </div>
+    {% endfor %}
+{% endblock %}
