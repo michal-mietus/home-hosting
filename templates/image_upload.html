@@ -1,11 +1,39 @@
 {% extends 'base.html' %}
 
-{% block title %}Upload image{% endblock %}
 
 {% block content %}
-<form method='POST' enctype='multipart/form-data'>
-    <label for='file'>Image</label>
-    <input type='file' name='file' multiple>
-    <input type='submit' value='Upload'>
-</form>
+<!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+          <h2 class="text-center text-uppercase text-secondary mb-0">Contact Me</h2>
+          <hr class="star-dark mb-5">
+          <div class="row">
+            <div class="col-lg-8 mx-auto">
+              <!-- To configure the contact form email address, go to mail/contact_me.php and update the email address in the PHP file on line 19. -->
+              <!-- The form should work on most web servers, but if the form is not working you may need to configure your web server differently. -->
+              <form name="sentMessage" method="POST" id="contactForm" novalidate="novalidate" enctype='multipart/form-data'>
+        
+                  <div class="form-group floating-label-form-group controls mb-0 pb-2">
+                    <label>Image name (optional)</label>
+                    <input class="form-control" id="image-name" name='image-name' type="text" placeholder="Image name">
+                    <p class="help-block text-danger"></p>
+                  </div>
+        
+                <div class="control-group">
+                  <div class="form-group floating-label-form-group controls mb-0 pb-2">
+                    <label>Image</label>
+                    <input class="form-control" id="images" name='images' type="file" placeholder="Images" required="required" data-validation-required-message="Please select your images." multiple>
+                    <p class="help-block text-danger"></p>
+                  </div>
+                </div>
+                <div id="success"></div>
+                <div class="form-group">
+                  <input type="submit" class="btn btn-primary btn-xl" id="sendMessageButton" value="Upload">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
 {% endblock %}
