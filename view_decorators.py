@@ -17,7 +17,7 @@ def deny_logged(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
         if is_logged():
-            return redirect(url_for('.main'))
+            return redirect(url_for('.display_images'))
         return function(*args, **kwargs)
     return wrapper
 
