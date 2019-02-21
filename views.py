@@ -8,6 +8,12 @@ import image_hosting
 views = Blueprint('views', __name__, template_folder='templates')
 
 
+@views.route('/', methods=['GET'])
+@deny_logged
+def unlogged():
+    return render_template('unlogged.html')
+
+
 @views.route('/login', methods=['GET', 'POST'])
 @deny_logged
 def login():
@@ -21,6 +27,15 @@ def login():
             flash('You\'re logged in. ')
             return redirect(url_for('.display_images'))
     return render_template('login.html', error=error)
+
+
+@views.route('/logout', methods=['GET'])
+@login_required
+def logout():
+    if session['logged_in']:
+        session['logged_in'] = False
+        return redirect(url_for('.unlogged'))
+    return redirect(url_for('.display_images'))
 
 
 @views.route('/register', methods=['GET', 'POST'])
@@ -63,7 +78,7 @@ def upload_image():
     return render_template('image_upload.html')
 
 
-@views.route('/', methods=['GET', 'POST'])
+@views.route('/main', methods=['GET', 'POST'])
 @login_required
 def display_images():
     filenames = []
