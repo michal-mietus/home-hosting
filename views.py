@@ -7,10 +7,6 @@ import image_hosting
 
 views = Blueprint('views', __name__, template_folder='templates')
 
-@views.route('/')
-def main():
-    return 'Main Page'
-
 
 @views.route('/login', methods=['GET', 'POST'])
 @deny_logged
@@ -23,7 +19,7 @@ def login():
         else:
             session['logged_in'] = True
             flash('You\'re logged in. ')
-            return redirect(url_for('.main'))
+            return redirect(url_for('.display_images'))
     return render_template('login.html', error=error)
 
 
@@ -41,18 +37,8 @@ def register():
             user.save()
             session['logged_in'] = True
             flash('You\'re logged in. ')
-            return redirect(url_for('.main'))
+            return redirect(url_for('.display_images'))
     return render_template('register.html', error=error)
-
-
-@views.route('/user/all', methods=['GET', 'POST'])
-@login_required
-def users():
-    sql = 'SELECT * FROM users'
-    cursor = image_hosting.get_cursor()
-    cursor.execute(sql)
-    users = cursor.fetchall()
-    return render_template('users.html', users=users)
 
 
 @views.route('/image/add', methods=['GET', 'POST'])
@@ -60,24 +46,24 @@ def users():
 def upload_image():
     if request.method == 'POST':
         # check if the post request has the file part
-        if 'file' not in request.files:
+        if 'images' not in request.files:
             flash('No file part')
-            return redirect('.' + request.url)
-        file = request.files['file']
+            return redirect(request.url)
+        file = request.files['images']
         # if user does not select file, browser also
         # submit an empty part without filename
         if file.filename == '':
-            flash('No selected file')
-            return redirect('.' + request.url)
+            flash('No selected images')
+            return redirect(request.url)
         if file and image_hosting.allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(image_hosting.app.config['UPLOAD_FOLDER'], filename))
-            return render_template('image_upload_success.html')
+            return redirect(url_for('.display_images'))
 
     return render_template('image_upload.html')
 
 
-@views.route('/image/all', methods=['GET', 'POST'])
+@views.route('/', methods=['GET', 'POST'])
 @login_required
 def display_images():
     filenames = []
