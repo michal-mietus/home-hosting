@@ -11,7 +11,7 @@ views = Blueprint('views', __name__, template_folder='templates')
 @views.route('/', methods=['GET'])
 @deny_logged
 def unlogged():
-    return render_template('unlogged.html')
+    return render_template('login.html')
 
 
 @views.route('/login', methods=['GET', 'POST'])
