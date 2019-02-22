@@ -1,0 +1,13 @@
+sys {
+    postgresql 
+    postgresql-contrib 
+    libpq-dev
+}
+
+pip {
+    psycopg2 
+    Flask-SQLAlchemy 
+    Flask-Migrate
+    flask_script
+    flask_migrate
+}
