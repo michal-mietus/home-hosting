@@ -1,27 +1,37 @@
-import image_hosting
+from flask_sqlalchemy import SQLAlchemy
+import app
+import datetime
+
+db = SQLAlchemy()
+
+class BaseModel(db.Model):
+    """Base data model for all objects"""
+    __abstract__ = True
+
+    def __init__(self, *args):
+        super().__init__(*args)
+
+    def __repr__(self):
+        """Define a base way to print models"""
+        return '%s(%s)' % (self.__class__.__name__, {
+            column: value
+            for column, value in self._to_dict().items()
+        })
+
+    def json(self):
+        """
+                Define a base way to jsonify models, dealing with datetime objects
+        """
+        return {
+            column: value if not isinstance(value, datetime.date) else value.strftime('%Y-%m-%d')
+            for column, value in self._to_dict().items()
+        }
 
 
-class User:
-    class UserAlreadExistsException(Exception): 
-        def __str__(self):
-            return 'User with that username already exists!'
+class File(BaseModel, db.Model):
+    """Model for the stations table"""
+    __tablename__ = 'file'
 
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-        self.table = 'users'
-
-    def save(self):
-        if image_hosting.get_object(self.table, **{'username': self.username}) == []:
-            sql = "INSERT INTO users (username, password) VALUES (?, ?);"
-            db = image_hosting.get_db()  # while inserting have to call db.commit (connection)
-            cursor = image_hosting.get_cursor()
-            cursor.execute(sql, (self.username, self.password))
-            db.commit()  # connection commit
-        else:
-            return self.UserAlreadExistsException()
-
-    def is_created(self):
-        if image_hosting.get_object(self.table, **{'username': self.username}):
-            return True
-        return False
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String)
+    lng = db.Column(db.Float)
