@@ -1,8 +1,10 @@
 import os
 import sqlite3
 from flask import Flask, g
+from flask_sqlalchemy import SQLAlchemy
 from views import views
 from key import SECRET_KEY 
+from models import db
 
 
 app = Flask(__name__)
@@ -17,13 +19,28 @@ configuration = dict(
 
 )
 
+POSTGRES = {
+    'user': 'lessonsuser',
+    'pw': 'password',
+    'db': 'lessons',
+    'host': 'localhost',
+    'port': '5432',
+}
+
 app.config.from_object(__name__) # load config from this file , flaskr.py
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
+%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 
 # Load default config and override config from an environment variable
 app.config.update(configuration)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
+# ...app config...
+db.init_app(app)
+
 app.register_blueprint(views)
+
 
 @app.teardown_appcontext
 def close_db(error):
