@@ -2,7 +2,8 @@
 Flask application to store mind maps, plans, pictures etc.
 
 ## Introduction
-This project was created for easy sharing files, images from ex. my phone to server, 
+This project was created for easy sharing files, 
+images from my phone to server, 
 which was initially running on Raspberry Pi 3.
 
 ## Technologies
