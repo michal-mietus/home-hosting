@@ -19,23 +19,21 @@ git clone https://github.com/michal-mietus/home-hosting.git
 cd home-hosting
 ```
 
-Create PostgreSQL database.
+* Create PostgreSQL database.
 
-Apply PostreSQL database settings to 'app.py' file into POSTGRES variable.
+* Apply PostreSQL database settings to 'app.py' file into POSTGRES variable.
 
-In application folder you have to create file 'key.py' with your SECRET_KEY variable.
+* In application folder you have to create file 'key.py' with your SECRET_KEY variable.
 
-After setting key and with created database you should run migrations with command:
+* After setting key and with created database you should run migrations with command:
 ```
 python3 manage.py db init
 python3 manage.py db migrate
 ```
 
-Finally you can run your application with:
+* Finally you can run your application with:
 
 ```
 export FLASK_APP=app.py
 run flask
 ```
-
-##
